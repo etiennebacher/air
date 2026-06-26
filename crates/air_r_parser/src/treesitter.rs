@@ -1,5 +1,9 @@
+use std::sync::LazyLock;
+
 use air_r_syntax::RSyntaxKind;
-use tree_sitter::{Node, TreeCursor};
+use tree_sitter::Language;
+use tree_sitter::Node;
+use tree_sitter::TreeCursor;
 
 /// `WalkEvent` describes tree walking process.
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -86,8 +90,14 @@ impl<'tree> Iterator for Preorder<'tree> {
     }
 }
 
-fn node_syntax_kind(x: &Node) -> RSyntaxKind {
-    match x.kind() {
+/// Maps a tree-sitter node "kind" string to its [RSyntaxKind].
+///
+/// Returns `None` for tree-sitter symbols that we never walk (hidden rules, the
+/// zero-width `_start` external, etc.). Those never appear during a successful
+/// parse, so this only feeds the [KIND_TABLE] precomputation; see
+/// [node_syntax_kind] for the per-node lookup.
+fn node_syntax_kind_from_str(kind: &str) -> Option<RSyntaxKind> {
+    Some(match kind {
         "program" => RSyntaxKind::R_ROOT,
         "unary_operator" => RSyntaxKind::R_UNARY_EXPRESSION,
         "binary_operator" => RSyntaxKind::R_BINARY_EXPRESSION,
@@ -179,8 +189,40 @@ fn node_syntax_kind(x: &Node) -> RSyntaxKind {
         "dots" => RSyntaxKind::R_DOTS,
         "dot_dot_i" => RSyntaxKind::R_DOT_DOT_I,
         "comment" => RSyntaxKind::COMMENT,
-        kind => unreachable!("Not implemented: '{kind}'."),
-    }
+        _ => return None,
+    })
+}
+
+/// Lookup table mapping tree-sitter symbol ids to [RSyntaxKind].
+///
+/// [node_syntax_kind_from_str] needs a node's kind as a string, which is an FFI
+/// call plus UTF-8 validation, followed by a large string `match` — and we pay
+/// that for every node we enter and leave. Instead we precompute the mapping
+/// once, indexed by the numeric symbol id from `Node::kind_id()`, turning the
+/// per-node cost into a single array load.
+static KIND_TABLE: LazyLock<Vec<Option<RSyntaxKind>>> = LazyLock::new(|| {
+    let language: Language = tree_sitter_r::LANGUAGE.into();
+    // `node_kind_for_id` is the inverse of `kind_id()`, so the table agrees
+    // exactly with `node_syntax_kind_from_str(node.kind())` for every id.
+    (0..language.node_kind_count())
+        .map(|id| {
+            language
+                .node_kind_for_id(id as u16)
+                .and_then(node_syntax_kind_from_str)
+        })
+        .collect()
+});
+
+fn node_syntax_kind(node: &Node) -> RSyntaxKind {
+    // `kind_id()` always returns a symbol id `< node_kind_count()`, the length
+    // of `KIND_TABLE`, so this index never panics.
+    KIND_TABLE[node.kind_id() as usize].unwrap_or_else(|| node_syntax_kind_cold(node))
+}
+
+#[cold]
+#[inline(never)]
+fn node_syntax_kind_cold(node: &Node) -> ! {
+    unreachable!("Not implemented: '{}'.", node.kind())
 }
 
 pub trait NodeTypeExt: Sized {
