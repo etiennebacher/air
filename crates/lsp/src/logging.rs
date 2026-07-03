@@ -256,8 +256,13 @@ pub(crate) fn init_logging(
         .with(filter_layer)
         .with(writer_layer);
 
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("Should be able to set the global subscriber exactly once.");
+    // A production server process initializes exactly once, but tests spin up
+    // one server per test within a single process when run under plain
+    // `cargo test` (nextest isolates each test in its own process). Only the
+    // first server can install the global subscriber; later ones keep the
+    // existing one. Failing loudly here used to panic mid-handshake and hang
+    // the whole test binary, since the client kept waiting for a response.
+    let _ = tracing::subscriber::set_global_default(subscriber);
 
     // Emit message after subscriber is set up, so we actually see it
     tracing::info!("{message}");
