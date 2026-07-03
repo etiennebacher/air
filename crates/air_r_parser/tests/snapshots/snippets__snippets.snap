@@ -1,6 +1,5 @@
 ---
 source: crates/air_r_parser/tests/snippets.rs
-assertion_line: 202
 expression: snapshot
 ---
 ""

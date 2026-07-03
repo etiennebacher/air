@@ -338,160 +338,25 @@ mod tests {
         );
     }
 
+    /// The raw event streams were asserted here when the tree-sitter walker
+    /// produced them; the Pratt parser builds an equivalent stream through
+    /// `Marker::precede` (`forward_parent` links), so we lock in the
+    /// resolved tree instead.
     #[test]
     fn test_parse_smoke_test() {
-        let (events, trivia, _errors) = parse_text("1+1", RParserOptions::default());
-
-        let expect = vec![
-            Event::Start {
-                kind: RSyntaxKind::R_ROOT,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_EXPRESSION_LIST,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_BINARY_EXPRESSION,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_DOUBLE_VALUE,
-                forward_parent: None,
-            },
-            Event::Token {
-                kind: RSyntaxKind::R_DOUBLE_LITERAL,
-                end: TextSize::from(1),
-            },
-            Event::Finish,
-            Event::Token {
-                kind: RSyntaxKind::PLUS,
-                end: TextSize::from(2),
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_DOUBLE_VALUE,
-                forward_parent: None,
-            },
-            Event::Token {
-                kind: RSyntaxKind::R_DOUBLE_LITERAL,
-                end: TextSize::from(3),
-            },
-            Event::Finish,
-            Event::Finish,
-            Event::Finish,
-            Event::Finish,
-        ];
-
-        assert!(trivia.is_empty());
+        let parsed = crate::parse("1+1", RParserOptions::default());
+        insta::assert_snapshot!(format!("{:#?}", parsed.syntax()));
     }
 
     #[test]
     fn test_parse_function_definition() {
-        let (events, trivia, _errors) = parse_text("function() 1", RParserOptions::default());
-
-        let expect = vec![
-            Event::Start {
-                kind: RSyntaxKind::R_ROOT,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_EXPRESSION_LIST,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_FUNCTION_DEFINITION,
-                forward_parent: None,
-            },
-            Event::Token {
-                kind: RSyntaxKind::FUNCTION_KW,
-                end: TextSize::from(8),
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_PARAMETERS,
-                forward_parent: None,
-            },
-            Event::Token {
-                kind: RSyntaxKind::L_PAREN,
-                end: TextSize::from(9),
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_PARAMETER_LIST,
-                forward_parent: None,
-            },
-            Event::Finish, // R_PARAMETER_LIST
-            Event::Token {
-                kind: RSyntaxKind::R_PAREN,
-                end: TextSize::from(10),
-            },
-            Event::Finish, // R_PARAMETERS
-            Event::Start {
-                kind: RSyntaxKind::R_DOUBLE_VALUE,
-                forward_parent: None,
-            },
-            Event::Token {
-                kind: RSyntaxKind::R_DOUBLE_LITERAL,
-                end: TextSize::from(12),
-            },
-            Event::Finish, // R_DOUBLE_VALUE
-            Event::Finish, // R_FUNCTION_DEFINITION
-            Event::Finish, // R_EXPRESSION_LIST
-            Event::Finish, // R_ROOT
-        ];
-
-        let expect = vec![ws(10, 11, Pos::Leading)];
-        assert_eq_trivia(trivia, expect);
+        let parsed = crate::parse("function() 1", RParserOptions::default());
+        insta::assert_snapshot!(format!("{:#?}", parsed.syntax()));
     }
 
     #[test]
     fn test_parse_call() {
-        let (events, trivia, _errors) = parse_text("fn()", RParserOptions::default());
-
-        let expect = vec![
-            Event::Start {
-                kind: RSyntaxKind::R_ROOT,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_EXPRESSION_LIST,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_CALL,
-                forward_parent: None,
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_IDENTIFIER,
-                forward_parent: None,
-            },
-            Event::Token {
-                kind: RSyntaxKind::IDENT,
-                end: TextSize::from(2),
-            },
-            Event::Finish, // R_IDENTIFIER
-            Event::Start {
-                kind: RSyntaxKind::R_CALL_ARGUMENTS,
-                forward_parent: None,
-            },
-            Event::Token {
-                kind: RSyntaxKind::L_PAREN,
-                end: TextSize::from(3),
-            },
-            Event::Start {
-                kind: RSyntaxKind::R_ARGUMENT_LIST,
-                forward_parent: None,
-            },
-            Event::Finish, // R_ARGUMENT_LIST
-            Event::Token {
-                kind: RSyntaxKind::R_PAREN,
-                end: TextSize::from(4),
-            },
-            Event::Finish, // R_CALL_ARGUMENTS
-            Event::Finish, // R_CALL
-            Event::Finish, // R_EXPRESSION_LIST
-            Event::Finish, // R_ROOT
-        ];
-
-        let expect = vec![];
-        assert_eq_trivia(trivia, expect);
+        let parsed = crate::parse("fn()", RParserOptions::default());
+        insta::assert_snapshot!(format!("{:#?}", parsed.syntax()));
     }
 }
