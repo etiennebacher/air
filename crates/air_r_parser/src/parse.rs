@@ -7,7 +7,6 @@ use biome_parser::prelude::Trivia;
 use biome_rowan::AstNode;
 use biome_rowan::NodeCache;
 use biome_rowan::SendNode;
-use biome_rowan::TextSize;
 
 use crate::ParseError;
 use crate::RLosslessTreeSink;
@@ -121,51 +120,10 @@ fn parse_text(
     crate::grammar::parse_text(text)
 }
 
-pub(crate) fn parse_failure(
-    text: &str,
-) -> (Vec<Event<RSyntaxKind>>, Vec<Trivia>, Option<ParseError>) {
-    // Safety: We don't allow files longer than a `u32` can support.
-    let end =
-        TextSize::try_from(text.len()).expect("`text` can't be longer than `TextSize` allows.");
-
-    // Must provide a valid root node on failures, otherwise `tree_sink.finish()` fails.
-    // An `R_ROOT` must have an `R_EXPRESSION_LIST`, and we force that to hold 1 bogus
-    // expression that spans the whole file. This allows the AST printer to work correctly
-    // in error tests, and during debugging.
-    let events = vec![
-        Event::Start {
-            kind: RSyntaxKind::R_ROOT,
-            forward_parent: None,
-        },
-        Event::Start {
-            kind: RSyntaxKind::R_EXPRESSION_LIST,
-            forward_parent: None,
-        },
-        Event::Start {
-            kind: RSyntaxKind::R_BOGUS_EXPRESSION,
-            forward_parent: None,
-        },
-        Event::Token {
-            kind: RSyntaxKind::R_BOGUS,
-            end,
-        },
-        Event::Finish,
-        Event::Finish,
-        Event::Finish,
-    ];
-
-    // No trivia
-    let trivia = vec![];
-
-    // Single parse error for now
-    let error = ParseError::new(String::from("Failed to parse due to syntax errors."));
-
-    (events, trivia, Some(error))
-}
-
 #[cfg(test)]
 mod tests {
     use biome_rowan::TextRange;
+    use biome_rowan::TextSize;
     use biome_rowan::TriviaPieceKind;
 
     use super::*;

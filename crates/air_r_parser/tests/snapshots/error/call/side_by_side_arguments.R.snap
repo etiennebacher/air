@@ -19,11 +19,22 @@ RRoot {
     expressions: RExpressionList [
         RBogusExpression {
             items: [
-                R_BOGUS@0..68 "# Can't have two arguments side by side without a delimiter\nfn(a b)\n" [] [],
+                RIdentifier {
+                    name_token: IDENT@0..62 "fn" [Comments("# Can't have two argu ..."), Newline("\n")] [],
+                },
+                L_PAREN@62..63 "(" [] [],
+                RArgument {
+                    name_clause: missing (optional),
+                    value: RIdentifier {
+                        name_token: IDENT@63..64 "a" [] [],
+                    },
+                },
+                IDENT@64..66 "b" [Whitespace(" ")] [],
+                R_PAREN@66..67 ")" [] [],
             ],
         },
     ],
-    eof_token: EOF@68..68 "" [] [],
+    eof_token: EOF@67..68 "" [Newline("\n")] [],
 }
 ```
 
@@ -32,10 +43,18 @@ RRoot {
 ```
 0: R_ROOT@0..68
   0: (empty)
-  1: R_EXPRESSION_LIST@0..68
-    0: R_BOGUS_EXPRESSION@0..68
-      0: R_BOGUS@0..68 "# Can't have two arguments side by side without a delimiter\nfn(a b)\n" [] []
-  2: EOF@68..68 "" [] []
+  1: R_EXPRESSION_LIST@0..67
+    0: R_BOGUS_EXPRESSION@0..67
+      0: R_IDENTIFIER@0..62
+        0: IDENT@0..62 "fn" [Comments("# Can't have two argu ..."), Newline("\n")] []
+      1: L_PAREN@62..63 "(" [] []
+      2: R_ARGUMENT@63..64
+        0: (empty)
+        1: R_IDENTIFIER@63..64
+          0: IDENT@63..64 "a" [] []
+      3: IDENT@64..66 "b" [Whitespace(" ")] []
+      4: R_PAREN@66..67 ")" [] []
+  2: EOF@67..68 "" [Newline("\n")] []
 
 ```
 

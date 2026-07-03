@@ -34,8 +34,9 @@ pub(crate) fn parse_braces(p: &mut RParser) -> Option<CompletedMarker> {
     p.bump(L_CURLY);
     p.push_significance(true);
 
-    let list = parse_expression_list(p, R_CURLY);
-    let ok = list.is_some() && p.expect(R_CURLY);
+    // Never fails: errors inside the block recover per-statement
+    parse_expression_list(p, R_CURLY);
+    let ok = p.expect(R_CURLY);
 
     p.pop_significance();
     if !ok {

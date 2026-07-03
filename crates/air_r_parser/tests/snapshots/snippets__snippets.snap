@@ -118,8 +118,17 @@ expression: snapshot
 0: R_ROOT@0..5
   0: (empty)
   1: R_EXPRESSION_LIST@0..5
-    0: R_BOGUS_EXPRESSION@0..5
-      0: R_BOGUS@0..5 "f(a;)" [] []
+    0: R_CALL@0..5
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "f" [] []
+      1: R_CALL_ARGUMENTS@1..5
+        0: L_PAREN@1..2 "(" [] []
+        1: R_ARGUMENT_LIST@2..3
+          0: R_ARGUMENT@2..3
+            0: (empty)
+            1: R_IDENTIFIER@2..3
+              0: IDENT@2..3 "a" [] []
+        2: R_PAREN@3..5 ")" [Whitespace(";")] []
   2: EOF@5..5 "" [] []
 
 ====================
@@ -128,8 +137,18 @@ expression: snapshot
 0: R_ROOT@0..7
   0: (empty)
   1: R_EXPRESSION_LIST@0..7
-    0: R_BOGUS_EXPRESSION@0..7
-      0: R_BOGUS@0..7 "f(a; b)" [] []
+    0: R_BOGUS_EXPRESSION@0..3
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "f" [] []
+      1: L_PAREN@1..2 "(" [] []
+      2: R_ARGUMENT@2..3
+        0: (empty)
+        1: R_IDENTIFIER@2..3
+          0: IDENT@2..3 "a" [] []
+    1: R_IDENTIFIER@3..6
+      0: IDENT@3..6 "b" [Whitespace("; ")] []
+    2: R_BOGUS_EXPRESSION@6..7
+      0: R_PAREN@6..7 ")" [] []
   2: EOF@7..7 "" [] []
 
 ====================
@@ -138,8 +157,11 @@ expression: snapshot
 0: R_ROOT@0..4
   0: (empty)
   1: R_EXPRESSION_LIST@0..4
-    0: R_BOGUS_EXPRESSION@0..4
-      0: R_BOGUS@0..4 "(1;)" [] []
+    0: R_PARENTHESIZED_EXPRESSION@0..4
+      0: L_PAREN@0..1 "(" [] []
+      1: R_DOUBLE_VALUE@1..2
+        0: R_DOUBLE_LITERAL@1..2 "1" [] []
+      2: R_PAREN@2..4 ")" [Whitespace(";")] []
   2: EOF@4..4 "" [] []
 
 ====================
@@ -226,7 +248,16 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..7
     0: R_BOGUS_EXPRESSION@0..7
-      0: R_BOGUS@0..7 "x[[1] ]" [] []
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "x" [] []
+      1: L_BRACK2@1..3 "[[" [] []
+      2: R_ARGUMENT_LIST@3..4
+        0: R_ARGUMENT@3..4
+          0: (empty)
+          1: R_DOUBLE_VALUE@3..4
+            0: R_DOUBLE_LITERAL@3..4 "1" [] []
+      3: R_BRACK@4..5 "]" [] []
+      4: R_BRACK@5..7 "]" [Whitespace(" ")] []
   2: EOF@7..7 "" [] []
 
 ====================
@@ -325,7 +356,10 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..3
     0: R_BOGUS_EXPRESSION@0..3
-      0: R_BOGUS@0..3 "x[[" [] []
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "x" [] []
+      1: L_BRACK2@1..3 "[[" [] []
+      2: R_ARGUMENT_LIST@3..3
   2: EOF@3..3 "" [] []
 
 ====================
@@ -335,7 +369,15 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..5
     0: R_BOGUS_EXPRESSION@0..5
-      0: R_BOGUS@0..5 "x[[a]" [] []
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "x" [] []
+      1: L_BRACK2@1..3 "[[" [] []
+      2: R_ARGUMENT_LIST@3..4
+        0: R_ARGUMENT@3..4
+          0: (empty)
+          1: R_IDENTIFIER@3..4
+            0: IDENT@3..4 "a" [] []
+      3: R_BRACK@4..5 "]" [] []
   2: EOF@5..5 "" [] []
 
 ====================
@@ -451,8 +493,11 @@ expression: snapshot
 0: R_ROOT@0..6
   0: (empty)
   1: R_EXPRESSION_LIST@0..6
-    0: R_BOGUS_EXPRESSION@0..6
-      0: R_BOGUS@0..6 "x\n<- 1" [] []
+    0: R_IDENTIFIER@0..1
+      0: IDENT@0..1 "x" [] []
+    1: R_BOGUS_EXPRESSION@1..6
+      0: ASSIGN@1..4 "<-" [Newline("\n")] []
+      1: R_DOUBLE_LITERAL@4..6 "1" [Whitespace(" ")] []
   2: EOF@6..6 "" [] []
 
 ====================
@@ -943,7 +988,15 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..6
     0: R_BOGUS_EXPRESSION@0..6
-      0: R_BOGUS@0..6 "f()::x" [] []
+      0: R_CALL@0..3
+        0: R_IDENTIFIER@0..1
+          0: IDENT@0..1 "f" [] []
+        1: R_CALL_ARGUMENTS@1..3
+          0: L_PAREN@1..2 "(" [] []
+          1: R_ARGUMENT_LIST@2..2
+          2: R_PAREN@2..3 ")" [] []
+      1: COLON2@3..5 "::" [] []
+      2: IDENT@5..6 "x" [] []
   2: EOF@6..6 "" [] []
 
 ====================
@@ -953,7 +1006,14 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..6
     0: R_BOGUS_EXPRESSION@0..6
-      0: R_BOGUS@0..6 "x$y::z" [] []
+      0: R_EXTRACT_EXPRESSION@0..3
+        0: R_IDENTIFIER@0..1
+          0: IDENT@0..1 "x" [] []
+        1: DOLLAR@1..2 "$" [] []
+        2: R_IDENTIFIER@2..3
+          0: IDENT@2..3 "y" [] []
+      1: COLON2@3..5 "::" [] []
+      2: IDENT@5..6 "z" [] []
   2: EOF@6..6 "" [] []
 
 ====================
@@ -1125,7 +1185,15 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..6
     0: R_BOGUS_EXPRESSION@0..6
-      0: R_BOGUS@0..6 "f(a b)" [] []
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "f" [] []
+      1: L_PAREN@1..2 "(" [] []
+      2: R_ARGUMENT@2..3
+        0: (empty)
+        1: R_IDENTIFIER@2..3
+          0: IDENT@2..3 "a" [] []
+      3: IDENT@3..5 "b" [Whitespace(" ")] []
+      4: R_PAREN@5..6 ")" [] []
   2: EOF@6..6 "" [] []
 
 ====================
@@ -1437,7 +1505,14 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..12
     0: R_BOGUS_EXPRESSION@0..12
-      0: R_BOGUS@0..12 "function(x,)" [] []
+      0: FUNCTION_KW@0..8 "function" [] []
+      1: L_PAREN@8..9 "(" [] []
+      2: R_PARAMETER@9..10
+        0: R_IDENTIFIER@9..10
+          0: IDENT@9..10 "x" [] []
+        1: (empty)
+      3: COMMA@10..11 "," [] []
+      4: R_PAREN@11..12 ")" [] []
   2: EOF@12..12 "" [] []
 
 ====================
@@ -1960,8 +2035,13 @@ expression: snapshot
 0: R_ROOT@0..4
   0: (empty)
   1: R_EXPRESSION_LIST@0..4
-    0: R_BOGUS_EXPRESSION@0..4
-      0: R_BOGUS@0..4 "x$if" [] []
+    0: R_EXTRACT_EXPRESSION@0..2
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "x" [] []
+      1: DOLLAR@1..2 "$" [] []
+      2: (empty)
+    1: R_BOGUS_EXPRESSION@2..4
+      0: IF_KW@2..4 "if" [] []
   2: EOF@4..4 "" [] []
 
 ====================
@@ -1970,8 +2050,13 @@ expression: snapshot
 0: R_ROOT@0..10
   0: (empty)
   1: R_EXPRESSION_LIST@0..10
-    0: R_BOGUS_EXPRESSION@0..10
-      0: R_BOGUS@0..10 "x$function" [] []
+    0: R_EXTRACT_EXPRESSION@0..2
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "x" [] []
+      1: DOLLAR@1..2 "$" [] []
+      2: (empty)
+    1: R_BOGUS_EXPRESSION@2..10
+      0: FUNCTION_KW@2..10 "function" [] []
   2: EOF@10..10 "" [] []
 
 ====================
@@ -2355,7 +2440,8 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..7
     0: R_BOGUS_EXPRESSION@0..7
-      0: R_BOGUS@0..7 "\"no end" [] []
+      0: STRING_OPEN@0..1 "\"" [] []
+      1: R_BOGUS@1..7 "no end" [] []
   2: EOF@7..7 "" [] []
 
 ====================
@@ -2397,7 +2483,8 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..2
     0: R_BOGUS_EXPRESSION@0..2
-      0: R_BOGUS@0..2 "()" [] []
+      0: L_PAREN@0..1 "(" [] []
+      1: R_PAREN@1..2 ")" [] []
   2: EOF@2..2 "" [] []
 
 ====================
@@ -2407,7 +2494,9 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..3
     0: R_BOGUS_EXPRESSION@0..3
-      0: R_BOGUS@0..3 "x +" [] []
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "x" [] []
+      1: PLUS@1..3 "+" [Whitespace(" ")] []
   2: EOF@3..3 "" [] []
 
 ====================
@@ -2437,7 +2526,8 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..1
     0: R_BOGUS_EXPRESSION@0..1
-      0: R_BOGUS@0..1 "{" [] []
+      0: L_CURLY@0..1 "{" [] []
+      1: R_EXPRESSION_LIST@1..1
   2: EOF@1..1 "" [] []
 
 ====================
@@ -2447,7 +2537,7 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..1
     0: R_BOGUS_EXPRESSION@0..1
-      0: R_BOGUS@0..1 "}" [] []
+      0: R_CURLY@0..1 "}" [] []
   2: EOF@1..1 "" [] []
 
 ====================
@@ -2457,7 +2547,10 @@ expression: snapshot
   0: (empty)
   1: R_EXPRESSION_LIST@0..2
     0: R_BOGUS_EXPRESSION@0..2
-      0: R_BOGUS@0..2 "f(" [] []
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "f" [] []
+      1: L_PAREN@1..2 "(" [] []
+      2: R_ARGUMENT_LIST@2..2
   2: EOF@2..2 "" [] []
 
 ====================
@@ -2471,5 +2564,116 @@ expression: snapshot
     1: R_IDENTIFIER@1..3
       0: IDENT@1..3 "b" [Whitespace(" ")] []
   2: EOF@3..3 "" [] []
+
+====================
+
+"one <- 1\nf(a b)\ntwo <- 2" (parse error)
+0: R_ROOT@0..24
+  0: (empty)
+  1: R_EXPRESSION_LIST@0..24
+    0: R_BINARY_EXPRESSION@0..8
+      0: R_IDENTIFIER@0..3
+        0: IDENT@0..3 "one" [] []
+      1: ASSIGN@3..6 "<-" [Whitespace(" ")] []
+      2: R_DOUBLE_VALUE@6..8
+        0: R_DOUBLE_LITERAL@6..8 "1" [Whitespace(" ")] []
+    1: R_BOGUS_EXPRESSION@8..15
+      0: R_IDENTIFIER@8..10
+        0: IDENT@8..10 "f" [Newline("\n")] []
+      1: L_PAREN@10..11 "(" [] []
+      2: R_ARGUMENT@11..12
+        0: (empty)
+        1: R_IDENTIFIER@11..12
+          0: IDENT@11..12 "a" [] []
+      3: IDENT@12..14 "b" [Whitespace(" ")] []
+      4: R_PAREN@14..15 ")" [] []
+    2: R_BINARY_EXPRESSION@15..24
+      0: R_IDENTIFIER@15..19
+        0: IDENT@15..19 "two" [Newline("\n")] []
+      1: ASSIGN@19..22 "<-" [Whitespace(" ")] []
+      2: R_DOUBLE_VALUE@22..24
+        0: R_DOUBLE_LITERAL@22..24 "2" [Whitespace(" ")] []
+  2: EOF@24..24 "" [] []
+
+====================
+
+"one <- 1; ) ; two <- 2" (parse error)
+0: R_ROOT@0..22
+  0: (empty)
+  1: R_EXPRESSION_LIST@0..22
+    0: R_BINARY_EXPRESSION@0..8
+      0: R_IDENTIFIER@0..3
+        0: IDENT@0..3 "one" [] []
+      1: ASSIGN@3..6 "<-" [Whitespace(" ")] []
+      2: R_DOUBLE_VALUE@6..8
+        0: R_DOUBLE_LITERAL@6..8 "1" [Whitespace(" ")] []
+    1: R_BOGUS_EXPRESSION@8..11
+      0: R_PAREN@8..11 ")" [Whitespace("; ")] []
+    2: R_BINARY_EXPRESSION@11..22
+      0: R_IDENTIFIER@11..17
+        0: IDENT@11..17 "two" [Whitespace(" ; ")] []
+      1: ASSIGN@17..20 "<-" [Whitespace(" ")] []
+      2: R_DOUBLE_VALUE@20..22
+        0: R_DOUBLE_LITERAL@20..22 "2" [Whitespace(" ")] []
+  2: EOF@22..22 "" [] []
+
+====================
+
+"{\n  good()\n  if broken\n  also_good()\n}" (parse error)
+0: R_ROOT@0..38
+  0: (empty)
+  1: R_EXPRESSION_LIST@0..38
+    0: R_BRACED_EXPRESSIONS@0..38
+      0: L_CURLY@0..1 "{" [] []
+      1: R_EXPRESSION_LIST@1..36
+        0: R_CALL@1..10
+          0: R_IDENTIFIER@1..8
+            0: IDENT@1..8 "good" [Newline("\n"), Whitespace("  ")] []
+          1: R_CALL_ARGUMENTS@8..10
+            0: L_PAREN@8..9 "(" [] []
+            1: R_ARGUMENT_LIST@9..9
+            2: R_PAREN@9..10 ")" [] []
+        1: R_BOGUS_EXPRESSION@10..22
+          0: IF_KW@10..15 "if" [Newline("\n"), Whitespace("  ")] []
+          1: IDENT@15..22 "broken" [Whitespace(" ")] []
+        2: R_CALL@22..36
+          0: R_IDENTIFIER@22..34
+            0: IDENT@22..34 "also_good" [Newline("\n"), Whitespace("  ")] []
+          1: R_CALL_ARGUMENTS@34..36
+            0: L_PAREN@34..35 "(" [] []
+            1: R_ARGUMENT_LIST@35..35
+            2: R_PAREN@35..36 ")" [] []
+      2: R_CURLY@36..38 "}" [Newline("\n")] []
+  2: EOF@38..38 "" [] []
+
+====================
+
+"f(a b) g(c d)\nfine()" (parse error)
+0: R_ROOT@0..20
+  0: (empty)
+  1: R_EXPRESSION_LIST@0..20
+    0: R_BOGUS_EXPRESSION@0..13
+      0: R_IDENTIFIER@0..1
+        0: IDENT@0..1 "f" [] []
+      1: L_PAREN@1..2 "(" [] []
+      2: R_ARGUMENT@2..3
+        0: (empty)
+        1: R_IDENTIFIER@2..3
+          0: IDENT@2..3 "a" [] []
+      3: IDENT@3..5 "b" [Whitespace(" ")] []
+      4: R_PAREN@5..6 ")" [] []
+      5: IDENT@6..8 "g" [Whitespace(" ")] []
+      6: L_PAREN@8..9 "(" [] []
+      7: IDENT@9..10 "c" [] []
+      8: IDENT@10..12 "d" [Whitespace(" ")] []
+      9: R_PAREN@12..13 ")" [] []
+    1: R_CALL@13..20
+      0: R_IDENTIFIER@13..18
+        0: IDENT@13..18 "fine" [Newline("\n")] []
+      1: R_CALL_ARGUMENTS@18..20
+        0: L_PAREN@18..19 "(" [] []
+        1: R_ARGUMENT_LIST@19..19
+        2: R_PAREN@19..20 ")" [] []
+  2: EOF@20..20 "" [] []
 
 ====================

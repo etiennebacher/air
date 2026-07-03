@@ -17,7 +17,8 @@ RRoot {
     expressions: RExpressionList [
         RBogusExpression {
             items: [
-                R_BOGUS@0..2 "()" [] [],
+                L_PAREN@0..1 "(" [] [],
+                R_PAREN@1..2 ")" [] [],
             ],
         },
     ],
@@ -32,7 +33,8 @@ RRoot {
   0: (empty)
   1: R_EXPRESSION_LIST@0..2
     0: R_BOGUS_EXPRESSION@0..2
-      0: R_BOGUS@0..2 "()" [] []
+      0: L_PAREN@0..1 "(" [] []
+      1: R_PAREN@1..2 ")" [] []
   2: EOF@2..2 "" [] []
 
 ```

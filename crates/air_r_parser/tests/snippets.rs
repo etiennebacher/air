@@ -181,6 +181,12 @@ const SNIPPETS: &[&str] = &[
     "}",
     "f(",
     "a b",
+    // Error recovery: statements around a syntax error still parse; the
+    // failed statement becomes one localized R_BOGUS_EXPRESSION
+    "one <- 1\nf(a b)\ntwo <- 2",
+    "one <- 1; ) ; two <- 2",
+    "{\n  good()\n  if broken\n  also_good()\n}",
+    "f(a b) g(c d)\nfine()",
 ];
 
 #[test]
