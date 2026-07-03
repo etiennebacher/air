@@ -24,8 +24,6 @@ biome_rowan = { workspace = true }
 biome_unicode_table = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 tracing = { workspace = true }
-tree-sitter = { workspace = true }
-tree-sitter-r = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true }

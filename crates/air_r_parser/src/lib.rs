@@ -1,9 +1,10 @@
 mod error;
+mod grammar;
+mod lexer;
 mod options;
 mod parse;
-
-#[allow(unused)]
-mod treesitter;
+mod parser;
+mod token_source;
 
 use air_r_factory::RSyntaxFactory;
 pub use error::ParseError;
