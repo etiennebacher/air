@@ -89,13 +89,39 @@ fn unary_binding_power(kind: RSyntaxKind) -> Option<u8> {
     })
 }
 
+/// Remaining stack below which we allocate a new segment. Deeply nested
+/// R (e.g. generated code full of `(((...)))`) recurses through
+/// [parse_expression]; tree-sitter handled arbitrary nesting with an explicit
+/// heap stack, so instead of overflowing (or imposing a depth limit that
+/// would reject files tree-sitter accepted) we grow the stack on demand, the
+/// same way rustc and rust-analyzer do.
+const STACK_RED_ZONE: usize = 128 * 1024;
+const STACK_GROW_SIZE: usize = 4 * 1024 * 1024;
+
 pub(crate) fn parse_expression(p: &mut RParser, min_bp: u8) -> Option<CompletedMarker> {
-    let lhs = parse_prefix(p)?;
-    parse_expression_rest(p, lhs, min_bp)
+    stacker::maybe_grow(STACK_RED_ZONE, STACK_GROW_SIZE, || {
+        let lhs = parse_prefix(p)?;
+        parse_expression_rest(p, lhs, min_bp)
+    })
 }
 
 /// Continue an expression from an already-parsed `lhs` (the Pratt led loop)
+///
+/// Also a stack-growth point: recursion can cycle through here without
+/// passing [parse_expression] (`parse_argument` continues from a pre-parsed
+/// name atom, so `x[[y[y[y[...` never enters [parse_expression] between
+/// levels).
 pub(crate) fn parse_expression_rest(
+    p: &mut RParser,
+    lhs: CompletedMarker,
+    min_bp: u8,
+) -> Option<CompletedMarker> {
+    stacker::maybe_grow(STACK_RED_ZONE, STACK_GROW_SIZE, || {
+        parse_expression_rest_inner(p, lhs, min_bp)
+    })
+}
+
+fn parse_expression_rest_inner(
     p: &mut RParser,
     mut lhs: CompletedMarker,
     min_bp: u8,
